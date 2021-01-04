@@ -1,47 +1,53 @@
-var car,wall
+const Engine = Matter.Engine;
+const World = Matter.World;
+const Bodies = Matter.Bodies;
+const Body = Matter.Body;
 
-var speed,weight
-
-
-
+var ground, gameState,engine, world,dustbin,paper;
 function setup() {
-  createCanvas(1500,400);
-  
-  speed=random(55,90);
-  weight=random(400,1500)
-  
-  
-  
-  car=createSprite(50, 200, 50, 50);
-   
-  car.velocityX = speed;
+  createCanvas(800, 400);
+  rectMode(CENTER);
 
-  car.shapeColor = color(80);
+  gameState = "start";
 
-  wall=createSprite(1000,200,60,height/2);
-  wall.shapeColor=color(80,80,80)
+  engine = Engine.create();
+  world = engine.world;
+  Engine.run(engine);
+
+  dustbin = new DustBin(720, 390, 100, 10);
+  paper = new Paper(100, 300, 10);
+  ground = Bodies.rectangle(width / 2, 400, width, 10,
+  {
+    isStatic: true
+  });
+  World.add(world, ground);
 }
-
 
 function draw() {
-  background(0);  
-  
-  if(wall.x-car.x < (car.width+wall.width)/2)
-  {
-    car.velocityX=0;
-    var deformation=0.5 *weight * speed * speed/22509;
-    if(deformation>180);
-    {
-      car.shapeColor=color(255,0,0)
+  if (gameState === "start") {
+    background("black");
+    textSize(20);
+    fill("red");
+    text("Press Up Arrow to Start, and Up to throw away the trash.", 50, 200)
+    if (keyCode === UP_ARROW) {
+      gameState = "play"
     }
-    if(deformation<180 && deformation>100)
-    {
-      car.shapeColor = color(230,230,0)
-    }
-    if(deformation<100)
-    {
-      car.shapeColor = color(0,255,0)
-    }
+  }
+  if (gameState === "play") {
+    rectMode(CENTER);
+    background(0);
+    dustbin.display();
+    paper.display();
+
+  }
 }
-  drawSprites();
+
+
+function keyPressed(){
+  if (keyCode === UP_ARROW && gameState === "play") {
+    Matter.Body.applyForce(paper.body, paper.body.position, {
+      x: 12,
+      y: -13
+    });
+  }
 }
